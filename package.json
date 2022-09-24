@@ -2,9 +2,10 @@
   "name": "poodr",
   "version": "1.0.0",
   "description": "This directory is notes and programs done while following the POODR book",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && node ./dist/index.js"
   },
   "author": "",
   "license": "ISC",

@@ -1,10 +1,9 @@
 {
-  "files": ["./index.ts", "./ch2.ts"],
+  "files": ["./src/index.ts", "./src/ch2.ts"],
   "compilerOptions": {
-    "outDir": "./dist/js/",
-    "sourceMap": true,
+    "outDir": "./dist/",
     "noImplicitAny": true,
-    "module": "es6",
+    "module": "commonjs",
     "target": "es5",
     "allowJs": true,
     "moduleResolution": "node"
