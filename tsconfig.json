@@ -1,10 +1,10 @@
 {
-  "files": ["./src/index.ts", "./src/ch2.ts"],
+  "files": ["./src/index.ts", "./src/ch2.ts", "./src/ch6.ts"],
   "compilerOptions": {
     "outDir": "./dist/",
     "noImplicitAny": true,
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2015",
     "allowJs": true,
     "moduleResolution": "node"
   }
