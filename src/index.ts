@@ -1,3 +1,3 @@
-import ch6 from './ch6';
+import ch7 from './ch7';
 
-ch6();
+ch7();
