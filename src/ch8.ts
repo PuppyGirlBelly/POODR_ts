@@ -1,124 +1,89 @@
 /* eslint-disable class-methods-use-this */
-/* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
+/* eslint-disable max-classes-per-file */
 
-/* This code is partially taken/inspired by the code in the following
- * repository: https://github.com/GeekChao/ppod/blob/master/src/6_27.ts
- */
+interface Part {
+  name: string;
+  description: string;
+  needsSpare?: boolean;
+}
+
+class Parts extends Array<Part> {
+  spares() {
+    return this.filter((part) => part.needsSpare);
+  }
+}
+
+class PartsFactory {
+  static build(config: Array<Array<string | boolean>>): Parts {
+    const partArray = config.map((p) => this.createPart(p));
+    const parts = new Parts();
+
+    partArray.forEach((part) => parts.push(part));
+
+    return parts;
+  }
+
+  static createPart(partConfig: Array<string | boolean>): Part {
+    return {
+      name: partConfig[0] as string,
+      description: partConfig[1] as string,
+      needsSpare: (partConfig[2] as boolean) ?? true,
+    };
+  }
+}
 
 interface BikeArgs {
   size?: string;
-  chain?: string;
-  tireSize?: string;
+  parts?: Parts;
 }
 
-interface RoadBikeArgs extends BikeArgs {
-  tapeColor: string;
-}
-
-interface MountainBikeArgs extends BikeArgs {
-  frontShock: string;
-  rearShock: string;
-}
-
-interface RecumbentBikeArgs extends BikeArgs {
-  flag: string;
-}
-
-type Bike = RoadBikeArgs | MountainBikeArgs | RecumbentBikeArgs;
-
-abstract class Bicycle {
+class Bicycle {
   size: string;
-  chain: string;
-  tireSize: string;
+  parts: Parts;
 
-  public constructor(args: Bike) {
+  public constructor(args: BikeArgs) {
     this.size = args.size;
-    this.chain = args.chain || this.defaultChain;
-    this.tireSize = args.tireSize || this.defaultTireSize;
-
-    this.postIntialization(args);
+    this.parts = args.parts;
   }
-
-  // eslint-disable-next-line no-unused-vars
-  abstract postIntialization(args: Bike): void;
 
   public spares() {
-    return {
-      tireSize: this.tireSize,
-      chain: this.chain,
-      ...this.localSpares,
-    };
-  }
-
-  protected abstract get localSpares(): any;
-
-  protected get defaultChain(): string {
-    return '10-speed';
-  }
-
-  protected get defaultTireSize(): string {
-    throw new Error(
-      `This ${this.constructor.name} does not implement the getter 'defaultTireSize()'`
-    );
+    return this.parts.spares();
   }
 }
 
-class RoadBike extends Bicycle {
-  tapeColor: string;
+export default function ch8(): void {
+  const roadConfig = [
+    ['chain', '10-speed'],
+    ['tire_size', '23'],
+    ['tape_color', 'red'],
+  ];
+  const mountainConfig = [
+    ['chain', '10-speed'],
+    ['tire_size', '2.1'],
+    ['front_shock', 'Manitou', false],
+    ['rear_shock', 'Fox'],
+  ];
+  const recumbentConfig = [
+    ['chain', '9-speed'],
+    ['tire_size', '28'],
+    ['flag', 'tall and orange']
+  ];
 
-  public postIntialization(args: RoadBikeArgs) {
-    this.tapeColor = args.tapeColor;
-  }
+  const roadBike = new Bicycle({
+    size: 'L',
+    parts: PartsFactory.build(roadConfig),
+  });
+  const mountainBike = new Bicycle({
+    size: 'L',
+    parts: PartsFactory.build(mountainConfig),
+  });
+  const recumbentBike = new Bicycle({
+    size: 'L',
+    parts: PartsFactory.build(recumbentConfig),
+  });
 
-  protected get localSpares() {
-    return { tapeColor: this.tapeColor };
-  }
-
-  protected get defaultTireSize() {
-    return '23';
-  }
+  console.log(roadBike.spares());
+  console.log(mountainBike.spares());
+  console.log(recumbentBike.spares());
 }
-
-class MountainBike extends Bicycle {
-  frontShock: string;
-  rearShock: string;
-
-  public postIntialization(args: MountainBikeArgs) {
-    this.frontShock = args.frontShock;
-    this.rearShock = args.rearShock;
-  }
-
-  protected get localSpares() {
-    return {
-      fronShock: this.frontShock,
-      rearShock: this.rearShock,
-    };
-  }
-
-  protected get defaultTireSize() {
-    return '2.1';
-  }
-}
-
-class RecumbentBike extends Bicycle {
-  flag: string;
-
-  public postIntialization(args: RecumbentBikeArgs) {
-    this.flag = args.flag;
-  }
-
-  protected get localSpares() {
-    return { flag: this.flag };
-  }
-
-  protected get defaultChain() {
-    return '9-speed';
-  }
-
-  protected get defaultTireSize() {
-    return '28';
-  }
-}
-
-export default function ch8(): void {}
