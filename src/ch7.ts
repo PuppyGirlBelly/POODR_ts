@@ -53,6 +53,10 @@ abstract class Bicycle {
       `This ${this.constructor.name} does not implement the getter 'defaultTireSize()'`
     );
   }
+
+  leadTime() {
+    return 1;
+  }
 }
 
 class RoadBike extends Bicycle {
@@ -71,12 +75,70 @@ class RoadBike extends Bicycle {
   }
 }
 
+class Vehicle {
+  leadTime() {
+    return 3;
+  }
+}
+
+class Mechanic {
+  leadTime() {
+    return 4;
+  }
+}
+
+/* ***MIXIN CODE*** */
+// eslint-disable-next-line no-unused-vars
+type GConstructor<T = {}> = new (...args: any[]) => T;
+type Scheduable = GConstructor<{ leadTime(): number }>;
+
+function Schedule<TBase extends Scheduable>(Base: TBase) {
+  return class Scheduler extends Base {
+    private isScheduled(
+      scheduable: typeof Base,
+      startDate: string,
+      endDate: string
+    ) {
+      console.log(
+        `This ${scheduable.name} is not scheduled\n\tbetween ${startDate} and ${endDate}`
+      );
+    }
+
+    public isSchedulable(startDate: Date, endDate: Date) {
+      // Clone startDate, to avoid subtracting from reference
+      const d = new Date(startDate.getTime());
+      d.setDate(startDate.getDate() - this.leadDays());
+
+      const start = d.toLocaleDateString();
+      const end = endDate.toLocaleDateString();
+      this.isScheduled(Base, start, end);
+    }
+
+    private leadDays(): number {
+      return this.leadTime() || 0;
+    }
+  };
+}
+
+const ScheduableRoadBike = Schedule(RoadBike);
+const ScheduableVehicle = Schedule(Vehicle);
+const ScheduableMechanic = Schedule(Mechanic);
+
+/* ***END MIXIN*** */
+
 export default function ch7(): void {
   const roadBikeOpts: RoadBikeArgs = {
     size: 'M',
     tapeColor: 'red',
   };
-  const roadBike = new RoadBike(roadBikeOpts);
+  const b = new ScheduableRoadBike(roadBikeOpts);
+  const v = new ScheduableVehicle();
+  const m = new ScheduableMechanic();
 
-  console.log(roadBike.spares);
+  const start = new Date('2015/09/04');
+  const end = new Date('2015/09/10');
+
+  b.isSchedulable(start, end);
+  v.isSchedulable(start, end);
+  m.isSchedulable(start, end);
 }
